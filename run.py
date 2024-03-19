@@ -1,19 +1,42 @@
 #! /usr/bin/python3
-import paho.mqtt.client as paho
-import random
 
-def on_connect(client, userdata, flags, rc):
-    if rc == 0:
-        print("Connected to MQTT Broker!")
-    else:
-        print("Failed to connect, return code %d\n", rc)
+import datetime
+import psutil
 
-client_id = f'python-mqtt-{ random.randint(0, 1000)}'
+HOST = "192.168.100.77"
+USER = "homeassistant"
+PASSWORD = "baziliy"
 
-client = paho.Client(paho.CallbackAPIVersion.VERSION2)
-client.username_pw_set("homeassistant", "baziliy")
-client.on_connect = on_connect
-print(client.connect("192.168.100.77", 1883))
+# Список всех публикуемых параметров группы SERVER
+server = {"boot_time": "",
+          "memory_usage": "",
+          "disk_usage": "",
+          "proc_temp": ""
+          }
 
-client.publish("test", "10", qos=2)
-print("111")
+
+# Публикует сообщение
+def mqtt_pub(topic, message):
+    import os
+    cmd_line = "mosquitto_pub -h %s -t %s -m %s -u %s -P %s" % (HOST, topic, message,
+                                                                USER, PASSWORD)
+    os.system(cmd_line)
+
+
+def run():
+    mqtt_pub("test", "hello")
+
+
+if __name__ == "__main__":
+    # run()
+    server["boot_time"] = datetime.datetime.fromtimestamp(psutil.boot_time()).strftime(
+                                                                    "%Y-%m-%d %H:%M:%S")
+    server["memory_usage"] = psutil.virtual_memory().percent
+    server["disk_usage"] = psutil.disk_usage('/').percent
+    server["proc_temp"] = psutil.sensors_temperatures()["coretemp"][0].current
+
+
+    print(server)
+
+else:
+    print("This program must be run as __main__.")
