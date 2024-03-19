@@ -11,7 +11,8 @@ PASSWORD = "baziliy"
 server = {"boot_time": "",
           "memory_usage": "",
           "disk_usage": "",
-          "proc_temp": ""
+          "cpu_temp": "",
+          "cpu_usage": ""
           }
 
 
@@ -33,8 +34,8 @@ if __name__ == "__main__":
                                                                     "%Y-%m-%d %H:%M:%S")
     server["memory_usage"] = psutil.virtual_memory().percent
     server["disk_usage"] = psutil.disk_usage('/').percent
-    server["proc_temp"] = psutil.sensors_temperatures()["coretemp"][0].current
-
+    server["cpu_temp"] = psutil.sensors_temperatures()["coretemp"][0].current
+    server["cpu_usage"] = psutil.cpu_percent(interval=0.1, percpu=False)
 
     print(server)
 
