@@ -31,7 +31,7 @@ def server_pub():
     server["cpu_temp"] = psutil.sensors_temperatures()["coretemp"][0].current
     server["cpu_usage"] = psutil.cpu_percent(interval=0.1, percpu=False)
     for item in server:
-        mqtt_pub(item, server[item])
+        mqtt_pub('srv/' + item, server[item])
 
 # Функция цикла работы
 def run():
